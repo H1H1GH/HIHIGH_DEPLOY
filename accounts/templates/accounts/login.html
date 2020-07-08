@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% block head %} 로그인 {% endblock %}
+{% block content %}
+<style>
+  h3{
+    color:#70c7be;
+    font-weight: bold;
+  }
+  label{
+    color:whitesmoke;
+  }
+  .form-text{
+    color:beige;
+  }
+  .form-control{
+    background-color: rgb(34,34,34);
+    border-color:#9d7ed0;
+    color:white;
+  }
+
+</style>
+
+<div class="container mt-5">
+  <h3 class="mb-4" style="text-align:center;"><i class="fas fa-tape"></i>&nbsp;로그인</h3>
+  <form action="" method="POST">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button class="btn" style="background-color:#7f92cf; color:white">로그인</button>
+  </form>
+</div>
+{% endblock %}

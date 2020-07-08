@@ -1,0 +1,130 @@
+<link rel="shortcut icon" href="../../../../../static/favicon.ico" type="image/x-icon">
+<link rel="icon" href="../../../../../static/favicon.ico" type="image/x-icon">
+
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+<style>
+	.modal-content {
+	background-color: rgb(34,34,34);
+	color:white;
+	font-family: 'Do Hyeon', sans-serif;
+  }
+  select#id_movie.form-control{
+    background-color: rgb(34,34,34);
+    color:white;
+	font-family: 'Do Hyeon', sans-serif;
+  }
+  input#id_title.form-control{
+    background-color: rgb(34,34,34);
+    color:white;
+	font-family: 'Do Hyeon', sans-serif;
+  }
+  select#id_rank.form-control{
+    background-color: rgb(34,34,34);
+    color:white;
+	font-family: 'Do Hyeon', sans-serif;
+  }
+  textarea#id_content.form-control{
+    background-color: rgb(34,34,34);
+    color:white;
+	font-family: 'Do Hyeon', sans-serif;
+  }
+</style>
+<div class="d-flex justify-content-center">
+	<div class="d-inline" style="width:33%;">
+		<div class="card" style="width: 42rem; background-color: transparent; color:white">
+			<div class="card-body" style="font-family: 'Do Hyeon', sans-serif;">
+				<h2 class="card-title">{{ qna.title }}</h2>
+                <p class="card-text">{{ qna.content }}</p>
+                <p class="card-text">{{ qna.user }}</p>
+				<p>Last created: {{ qna.created_at }}</p>
+				<p>Last updated: {{ qna.updated_at }}</p>
+				{% if user == qna.user %}
+				<div class="d-inline">
+					<button type="button" class="btn d-inline" data-toggle="modal" data-target="#exampleModal_1" style="background-color:#9d7ed0; color:white">
+						수정하기
+					</button>
+					<form class="d-inline" action="{% url 'movies:qna_delete' qna.id %}" method="POST">
+						{% csrf_token %}
+						<button role="button" class="btn" style="background-color: #7f92cf; color:white">삭제하기</button>
+					</form>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="exampleModal_1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel" style="color:#7e4bcf;">리뷰</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true" style="color:white;"><i class="fas fa-times"></i></span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<form action="{% url 'movies:qna_update' qna.id %}" method="POST" class="form">
+					{% csrf_token %}
+					{% bootstrap_form qna_form layout="inline" %}
+					<button type="submit" class="btn" style="background-color:#70c7be; color:white;">submit</button>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn" data-dismiss="modal" style="background-color:#7f92cf; color:white;">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container mt-5">
+	<h3 style="color:white; text-align:center; font-family:'Acme', sans-serif;"><i class="fas fa-comments"></i>&nbsp;Q&A_COMMENTS</h3>
+	<table class="table table-dark mt-4">
+		<thead>
+			<tr style="background-color: #70c7be; font-family: 'Do Hyeon', sans-serif; font-size:large;">
+				<th scope="col" style="text-align:center;">번호</th>
+				<th scope="col" style="text-align:center;">댓글</th>
+				<th scope="col" style="text-align:center;">작성자</th>
+				<th scope="col" style="text-align:center;">Edit</th>
+				<th scope="col" style="text-align:center;">Delete</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for qnacomment in qna.qnacomment_set.all %}
+			<tr style="background-color:rgb(34,34,34); color:white; text-align: center; font-family: 'Do Hyeon', sans-serif; font-size:large;">
+				<th scope="row">{{ forloop.counter }}</th>
+				<td>{{ qnacomment.content }}</td>
+				<td>{{ qnacomment.user }}</td>
+				<td>
+					{% if qnacomment.user == user %}
+					<a href="{% url 'movies:qnacomment_update' qna.id qnacomment.id %}"><button type="button" class="btn btn-outline-secondary btn-sm" style="background-color:#9d7ed0; color:white">수정</button></a>
+					{% endif %}
+				</td>
+				<td>
+					{% if qnacomment.user == user %}
+					<form action="{% url 'movies:qnacomment_delete' qna.id qnacomment.id %}" method = "POST">
+						{% csrf_token %}
+							<button class="btn btn-outline-secondary btn-sm" style="background-color:#7f92cf; color:white">삭제</button>
+					</form>
+					{% endif %}
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+	<br>
+	{% if request.user.is_staff %}
+		<form action="{% url 'movies:qnacomment_create' qna.id %}" method="POST">
+		{% csrf_token %}
+		{% bootstrap_form qnacomment_form layout="inline" %}
+		<button class="btn" style="background-color: orange; color:white; font-family:'Acme', sans-serif;">ADD COMMENT</button>
+		</form>
+	{% endif %}
+</div>
+<br>
+
+
+{% endblock %}

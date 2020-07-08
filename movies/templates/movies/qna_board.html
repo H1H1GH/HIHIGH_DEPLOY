@@ -1,0 +1,94 @@
+<link rel="shortcut icon" href="../../../static/favicon.ico" type="image/x-icon">
+<link rel="icon" href="../../../static/favicon.ico" type="image/x-icon">
+
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% block content %}
+
+<style>
+  a{
+    color:white;
+  }
+  .modal-content {
+  background-color: rgb(34,34,34);
+  color:white;
+  font-family: 'Do Hyeon', sans-serif;
+  }
+  select#id_movie.form-control{
+  background-color: rgb(34,34,34);
+  color:white;
+  font-family: 'Do Hyeon', sans-serif;
+  }
+  input#id_title.form-control{
+  background-color: rgb(34,34,34);
+  color:white;
+  font-family: 'Do Hyeon', sans-serif;
+  }
+  select#id_rank.form-control{
+  background-color: rgb(34,34,34);
+  color:white;
+  font-family: 'Do Hyeon', sans-serif;
+  }
+  textarea#id_content.form-control{
+  background-color: rgb(34,34,34);
+  color:white;
+  font-family: 'Do Hyeon', sans-serif;
+  }
+</style>
+<br>
+<h2 style="color:white; text-align:center; font-family:'Acme', sans-serif;">Q & A</h2>
+<br>
+<!-- Button trigger modal -->
+<div style="text-align:center;">
+  <button type="button" class="btn" data-toggle="modal" data-target="#exampleModal" style="background-color:coral; color:white;">
+    <i class="fas fa-plus"></i><span style="font-family: 'Do Hyeon', sans-serif;">&nbsp;글쓰기</span>
+  </button>
+</div>
+<br>
+<br>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel" style="color:#7e4bcf;">Q&A</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true" style="color:white;"><i class="fas fa-times"></i></span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{% url 'movies:qna_create' %}" method="POST" class="form">
+          {% csrf_token %}
+          {% bootstrap_form qna_form layout="inline" %}
+          <button type="submit" class="btn" style="background-color:#70c7be; color:white;">submit</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-dismiss="modal" style="background-color:#7f92cf; color:white;">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <table class="table table-dark">
+    <thead>
+      <tr style="background-color: orange; font-size:25px; font-family: 'Staatliches', cursive;">
+        <th scope="col" style="text-align:center; width: 10%"><i class="fas fa-question"></i></i></th>
+        <th scope="col" style="text-align:center; width: 40%">Title</th>
+        <th scope="col" style="text-align:center;">user</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for qna in qnas %}
+      <tr style="background-color:rgb(34,34,34); color:white; font-size:large;">
+        <th scope="row" style="text-align:center; font-family: 'Do Hyeon', sans-serif;">{{ forloop.counter }}</th>
+        <td style="text-align:center; font-family: 'Do Hyeon', sans-serif;"><a href="{% url 'movies:qna_detail' qna.id %}" style="color:coral;">{{ qna.title }}</a></td>
+        <td style="text-align:center; font-family: 'Do Hyeon', sans-serif;">{{ qna.user }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

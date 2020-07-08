@@ -1,0 +1,91 @@
+<link rel="shortcut icon" href="../../../static/favicon.ico" type="image/x-icon">
+<link rel="icon" href="../../../static/favicon.ico" type="image/x-icon">
+
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+<style>
+	.modal-content {
+    background-color: black;
+    color:white;
+  }
+</style>
+
+<br>
+<h2 class="text-center" style="color:white; font-family: 'Do Hyeon', sans-serif;"><i class="fas fa-film" style="color:yellowgreen"></i>
+  {{ request.user.username }}님을 위한 감독별 영화 추천 리스트&nbsp;<i class="fas fa-film" style="color:yellowgreen"></i></h2>
+<br>
+{% if like_movie_list|length != 0 %}
+	<div class="container mt-5">
+		<table class="table table-dark" style="text-align:center;">
+			<thead> 
+				<tr style="background-color: orange; font-size:25px; font-family: 'Staatliches', cursive;">
+				<th scope="col">Director</th>
+				<th scope="col">Title</th>
+				<th scope="col"><i class="fas fa-star" style="color:yellow"></i></th>
+			</tr>
+			</thead>
+			<tbody>
+				{% for movies in directors_movies %}
+					{% for movie in movies %}
+					{% if movie.movie_title not in like_movie_list %}
+					<tr style="background-color:rgb(34,34,34); color:white; font-size:large;" >
+						<td style="font-family:'Acme', sans-serif;">{{ movie.director}}</td>
+						<td style="font-family: 'Do Hyeon', sans-serif;"><!-- Button trigger modal -->
+							<a data-toggle="modal" href="#exampleModal{{ movie.id }}" style="color:coral;">
+								{{ movie.movie_title }}
+							</a>
+
+							<!-- Modal -->
+							<div class="modal fade" id="exampleModal{{ movie.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div class="modal-dialog" role="document">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h5 class="modal-title text-white" id="exampleModalLabel">{{movie.director}}</h5>
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true" style="color:white;"><i class="fas fa-times"></i></span>
+											</button>
+										</div>
+										<div class="modal-body d-flex justify-content-center">
+											<div class="card" style="width:30rem; height: 60rem;  border-color:black; background-color:black">
+												{% if movie.poster_path|length != 0 %}
+												<img src="{{ movie.poster_path }}" class="card-img-top" style="height:30rem" alt="...">
+												{% else %}
+												<img src="../../../static/no_image2.JPG" class="card-img-top" style="height:30rem" alt="...">
+												{% endif %}
+												<div class="card-body" style="background-color:rgb(34,34,34); color:white; text-align:center; max-height:50rem; overflow-y: scroll;">
+													<h5 class="card-title">{{ movie.movie_title }}</h5>
+													<h4 class="card-text mb-3"><i class="fas fa-star" style="color:gold"></i> {{ movie.rate }}</h4>
+													<p class="card-text">{{ movie.genre }}</p>
+													<p class="card-text">{{ movie.release_date }}</p>
+													<p class="card-text">{{ movie.overview }}</p>
+												</div>
+												<div class="card-footer" style="background-color:rgb(34,34,34)">
+													<a href="https://www.youtube.com/results?search_query={{movie.movie_title}}+%EC%98%88%EA%B3%A0%ED%8E%B8" class="image fit mt-2">
+														<button type="button" class="btn" style="background-color: #70c7be; color:white"><i class="fab fa-youtube"></i>&nbsp;TRAILER</button></a>
+												</div>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</td>
+						<td style="font-family: 'Do Hyeon', sans-serif;">{{ movie.rate }}</td>
+					</tr>
+					{% endif %}
+					{% endfor %}
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% else %}
+<h4 class="text-center" style="color:white; font-family: 'Do Hyeon', sans-serif;">영화를 추천해주세요! ><</h4>
+{% endif %}
+
+
+
+{% endblock %}

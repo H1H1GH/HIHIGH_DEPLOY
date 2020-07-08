@@ -1,0 +1,194 @@
+<link rel="shortcut icon" href="../../../static/favicon.ico" type="image/x-icon">
+<link rel="icon" href="../../../static/favicon.ico" type="image/x-icon">
+
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load bootstrap_pagination %}
+
+{% block content %}
+<style>
+  .pagination{
+      font-family:'Noto Sans', sans-serif;
+  }
+  .pagination li a.page-link{
+      background-color: transparent;
+      color:white;
+      border:transparent;
+      font-size:large;
+  }
+  .pagination li a.page-link:hover{
+      background-color: grey;
+      font-size:large;
+  }
+
+  .page-item.active .page-link{
+      background-color:darksalmon;
+      border-radius:50%;
+      border-color:darksalmon;
+      color:white;
+      font-size:large;
+  }
+
+  .page-item.disabled .page-link {
+  color: white;
+  pointer-events: none;
+  cursor: auto;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.modal-content {
+    background-color: rgb(34,34,34);
+    color:white;
+}
+
+</style>
+
+<br>
+<br>
+<h2 class="text-center" style="color:white; font-family: 'Do Hyeon', sans-serif;"><i class="fas fa-film" style="color:yellowgreen;"></i>
+  {{ request.user.username }}님을 위한 장르별 영화 추천 리스트&nbsp;<i class="fas fa-film" style="color:yellowgreen"></i></h2>
+
+<br>
+<br>
+{% if recommend|length != 0 %}
+<div class="container d-flex justify-content-center">
+	<div class="card-deck">
+		<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3">
+			{% for movie in page_obj %}
+			<!--<div class="col-sm-2 col-md-3 col-lg-3 my-1">-->
+			<div class="col mb-4">
+				<div class="card" style="width:20rem; text-align:center; height:45rem; border-color:black; background-color:black">
+					{% if movie.poster_path|length != 0 %}
+					<img src="{{ movie.poster_path }}" class="card-img-top" style="height:30rem" alt="...">
+					{% else %}
+					<img src="../../../static/no_image2.JPG" class="card-img-top" style="height:30rem" alt="...">
+					{% endif %}
+					<div class="card-body" style="background-color:rgb(34,34,34); color:white">
+						<h4 class="card-title" style="font-family: 'Do Hyeon', sans-serif;">{{ movie.movie_title }}</h4>
+           				<h5 class="card-text mb-3"><i class="fas fa-star" style="color:gold;"></i>  {{ movie.rate }}</h5>
+						{% if request.user in movie.like_users.all %}
+						<span class="card-text"><i class="fas fa-heart fa-lg like-btn" data-pk="{{ movie.pk }}" style = "color:crimson;"></i></span>
+						<span class="card-title cnt-{{ movie.id }}" style="font-size:large; font-family: 'Do Hyeon', sans-serif;">{{ movie.like_users.all|length }}</span>
+						{% else %}
+						<span class="card-text"><i class="fas fa-heart fa-lg like-btn" data-pk="{{ movie.pk }}" style = "color:palegoldenrod;"></i></span>
+						<span class="card-title cnt-{{ movie.id }}" style="font-size:large; font-family: 'Do Hyeon', sans-serif;">{{ movie.like_users.all|length }}</span>
+						{% endif %}
+					</div>
+					<div class="card-footer" style="background-color:rgb(34,34,34)">
+						<a href="https://www.youtube.com/results?search_query={{movie.movie_title}}+%EC%98%88%EA%B3%A0%ED%8E%B8" class="image fit">
+							<button type="button" class="btn" style="background-color: #70c7be; color:white; font-family:'Acme', sans-serif; "><i class="fab fa-youtube"></i>&nbsp;TRAILER</button></a>
+						<!-- Button trigger modal -->
+						<button type="button" class="btn" style="background-color: #7f92cf; color:white; font-family:'Acme', sans-serif; " data-toggle="modal"
+							data-target="#exampleModal{{ movie.id }}review">
+							REVIEW
+						</button>
+
+						<!-- Modal -->
+						<div class="modal fade" id="exampleModal{{ movie.id }}review" tabindex="-1" role="dialog"
+							aria-labelledby="exampleModalLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="exampleModalLabel" style="font-family: 'Do Hyeon', sans-serif; ">{{ movie.movie_title }} 리뷰</h5>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true" style="color:white;"><i class="fas fa-times"></i></span>
+										</button>
+									</div>
+									<div class="modal-body">
+										<table class="table text-center">
+											<thead style="background-color:#7f92cf; color:white;">
+												<tr>
+													<th scope="col" style="font-family: 'Do Hyeon', sans-serif;">글제목</th>
+													<th scope="col"><i class="fas fa-star" style="color:gold"></i></th>
+													<th scope="col" style="font-family: 'Do Hyeon', sans-serif;">작성자</th>
+												</tr>
+											</thead>
+											<!--for문쓰기-->
+											<tbody>
+												{% for review in reviews %}
+												{% if review.movie == movie %}
+												<tr style="color:white; font-family:'Do Hyeon', sans-serif; font-size:medium">
+													<td><a href="{% url 'movies:review_detail' review.movie.id review.id %}" style="color:#7f92cf;">{{ review.title }}</a></td>
+													<td>{{ review.rank }}</td>
+													<td>{{ review.user }}</td>
+												</tr>
+												{% endif %}
+												{% endfor %}
+											</tbody>
+										</table>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-dismiss="modal" style="background-color: #9d7ed0; color:white;">닫기</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<button type="button" class="btn" style="background-color:#9d7ed0; color:white; font-family:'Acme', sans-serif;" data-toggle="modal"
+							data-target="#exampleModal{{ movie.id }}detail">
+							MORE
+						</button>
+
+						<!-- Modal -->
+						<div class="modal fade" id="exampleModal{{ movie.id }}detail" tabindex="-1" role="dialog"
+							aria-labelledby="exampleModalLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h4 class="modal-title" id="exampleModalLabel" style="font-family:'Do Hyeon', sans-serif; color:#7f92cf;">{{ movie.movie_title }} 상세 정보</h4>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true" style="color:white;"><i class="fas fa-times"></i></span>
+										</button>
+									</div>
+									<div class="modal-body" style="font-family:'Do Hyeon', sans-serif; font-weight:lighter; font-size:medium;">
+										<p>{{ movie.genre }}</p>
+										<p>{{ movie.director }}</p>
+										<p>{{ movie.release_date }}</p>
+										<p>{{ movie.overview }}</p>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-dismiss="modal" style="background-color: #9d7ed0;"><span style="font-family: 'Do Hyeon', sans-serif;">닫기</span></button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+			<br>
+		</div>
+		<div class='mx-auto d-flex justify-content-center'>
+			{% bootstrap_paginate page_obj range=6 show_prev_next="false" show_first_last="true" %}
+		</div>
+	</div>
+</div>
+{% else %}
+<h4 class="text-center" style="color:white; font-family: 'Do Hyeon', sans-serif;">영화를 추천해주세요! ><</h4>
+{% endif %}
+<script>
+	const likeBtns = document.querySelectorAll('.like-btn')
+	likeBtns.forEach(function(btn){
+		btn.addEventListener('click', function(event){
+			axios.get(`/movies/${btn.dataset.pk}/like/`)
+			.then(function(res){
+				//console.log(res.data)
+				if (res.data.liked) {
+					btn.style.color = 'crimson'
+				} else {
+					btn.style.color = 'palegoldenrod'
+				}
+				const cntSpan = document.querySelector(`.cnt-${btn.dataset.pk}`)
+				cntSpan.innerText = res.data.count
+			})
+			.catch(function(err){
+				console.log(err)
+			})
+		})
+	})
+</script>
+
+
+
+{% endblock %}
